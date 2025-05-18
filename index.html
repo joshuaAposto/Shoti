@@ -295,8 +295,8 @@
             const videoInfoDetails = document.getElementById("videoInfoDetails");
             const staticContentSections = document.querySelectorAll(".static-content");
 
-            const yourApiKey = "$shoti-e8eb3429b9c018e4d164c01daf0090646b314994";
-            const endpoint = 'http://c1-par1.altare.pro:17405/api/request/f';
+            const apikey = "$shoti-4c229a6b707a85ed7e6543f57d5f501e81d1d781";
+            const endpoint = 'https://shotis.vercel.app/api/request/f';
 
             loadButton.disabled = true;
             loadButton.textContent = "Loading...";
@@ -313,7 +313,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': yourApiKey
+                        'X-API-Key': apikey
                     },
                     body: JSON.stringify({})
                 });
@@ -330,7 +330,7 @@
                                errorResponseMessage = `API Error (HTTP ${response.status}): ${errorText.substring(0,150)}`;
                            }
                         } catch (textError) {
-
+                           
                         }
                     }
                     throw new Error(errorResponseMessage);
