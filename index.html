@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Shoti Video Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            padding: 20px 20px 40px 20px;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .animated-text {
+            font-weight: 700;
+            background: linear-gradient(to right, #E700FE, #00C3FF, #E700FE, #00C3FF, #E700FE);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-fill-color: transparent;
+            animation: textShine 5s linear infinite;
+        }
+
+        h1.animated-text {
+            font-size: 26px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(224, 0, 254, 0.3), 0 0 5px rgba(0, 195, 255, 0.3);
+        }
+
+        .header h2.animated-text {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .rotating-border-container {
+            position: relative;
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 25px;
+            overflow: hidden;
+            margin: 15px auto;
+            padding: 3px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.5s ease-out, max-height 0.5s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
+        }
+
+        .rotating-border-container.hidden-after-generate {
+            opacity: 0;
+            max-height: 0;
+            padding: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            overflow: hidden;
+        }
+
+        .rotating-border-container::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 250%;
+            height: 250%;
+            background: conic-gradient(from 0deg, #E700FE, #00C3FF, #E700FE);
+            transform: translate(-50%, -50%);
+            animation: rotating 4s linear infinite;
+            z-index: 1;
+        }
+
+        .rotating-border-container>.inner-content,
+        .rotating-border-container>#loadButton,
+        .rotating-border-container>#myVideo,
+        .rotating-border-container>.video-info {
+            position: relative;
+            z-index: 2;
+            display: block;
+            border-radius: 22px;
+            background-color: #2d2d39;
+        }
+
+        #loadButton {
+            font-size: 18px;
+            padding: 15px 25px;
+            color: white;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            font-weight: 700;
+            text-align: center;
+            width: 100%;
+        }
+
+        #loadButton:hover {
+            background-color: #3f3f4a;
+        }
+
+        #loadButton:disabled {
+            background-color: #25252e;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        .video-outer-container {
+            max-width: 420px;
+        }
+
+        #myVideo {
+            width: 100%;
+            height: auto;
+            max-height: 55vh;
+            display: block;
+            border-radius: 10px;
+            background-color: #000;
+        }
+
+        .video-outer-container>#myVideo {
+            border-radius: 22px;
+        }
+
+        .info-outer-container {
+            max-width: 400px;
+        }
+
+        .video-info {
+            text-align: center;
+            padding: 15px;
+            backdrop-filter: blur(3px);
+        }
+
+        .video-info h2.animated-text {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .video-info p {
+            margin: 7px 0;
+            font-size: 13px;
+            color: #eee;
+        }
+
+        .video-info p strong {
+            color: #00C3FF;
+            font-weight: 700;
+        }
+
+        .content-section {
+            max-width: 650px;
+        }
+
+        .content-section .inner-content {
+            padding: 20px 25px;
+            text-align: left;
+        }
+
+        .content-section .inner-content h2.animated-text,
+        .content-section .inner-content h3.animated-text {
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .content-section .inner-content h3.animated-text {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .content-section .inner-content p,
+        .content-section .inner-content li {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+
+        .content-section .inner-content strong {
+            color: #00C3FF;
+            font-weight: 700;
+        }
+
+        .content-section .inner-content ol,
+        .content-section .inner-content ul {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-section .inner-content ol li,
+        .content-section .inner-content ul li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 600px) {
+            h1.animated-text {
+                font-size: 22px;
+            }
+
+            .header h2.animated-text {
+                font-size: 16px;
+            }
+
+            .rotating-border-container {
+                margin: 10px auto;
+                max-width: 95%;
+            }
+
+            #loadButton {
+                font-size: 16px;
+                padding: 12px 20px;
+            }
+
+            #myVideo {
+                max-height: 50vh;
+            }
+
+            .video-info {
+                padding: 10px;
+            }
+
+            .video-info h2.animated-text {
+                font-size: 18px;
+            }
+
+            .video-info p {
+                font-size: 12px;
+                margin: 5px 0;
+            }
+
+            .content-section .inner-content {
+                padding: 15px;
+            }
+
+            .content-section .inner-content h2.animated-text,
+            .content-section .inner-content h3.animated-text {
+                font-size: 20px;
+            }
+
+            .content-section .inner-content h3.animated-text {
+                font-size: 18px;
+            }
+
+            .content-section .inner-content p,
+            .content-section .inner-content li {
+                font-size: 14px;
+            }
+        }
+
+        @keyframes rotating {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes textShine {
+            0% {
+                background-position: 0% center;
+            }
+
+            100% {
+                background-position: -300% center;
+            }
+        }
+    </style>
+    <script>
+        async function loadVideo() {
+            const loadButton = document.getElementById("loadButton");
+            const mainHeader = document.getElementById("mainHeader");
+            const videoInfoContainer = document.querySelector(".info-outer-container");
+            const videoPlayerContainer = document.querySelector(".video-outer-container");
+            const myVideo = document.getElementById("myVideo");
+            const videoInfoDetails = document.getElementById("videoInfoDetails");
+            const staticContentSections = document.querySelectorAll(".static-content");
+
+            const yourApiKey = "$shoti-e8eb3429b9c018e4d164c01daf0090646b314994";
+            const endpoint = 'http://c1-par1.altare.pro:17405/api/request/f';
+
+            loadButton.disabled = true;
+            loadButton.textContent = "Loading...";
+
+            if (videoPlayerContainer) videoPlayerContainer.style.display = "none";
+            if (videoInfoContainer) videoInfoContainer.style.display = "none";
+            myVideo.src = "";
+            myVideo.style.display = "none";
+            if (videoInfoDetails) videoInfoDetails.innerHTML = "";
+
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': yourApiKey
+                    },
+                    body: JSON.stringify({})
+                });
+
+                if (!response.ok) {
+                    let errorResponseMessage = `API Error: HTTP status ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorResponseMessage = `API Error: ${errorData.message || errorData.error || `HTTP status ${response.status}`}`;
+                    } catch (jsonError) {
+                        try {
+                           const errorText = await response.text();
+                           if (errorText) {
+                               errorResponseMessage = `API Error (HTTP ${response.status}): ${errorText.substring(0,150)}`;
+                           }
+                        } catch (textError) {
+
+                        }
+                    }
+                    throw new Error(errorResponseMessage);
+                }
+
+                const data = await response.json();
+
+                if (!data || !data.url) {
+                    throw new Error("API response did not include a video URL or data was malformed.");
+                }
+
+                myVideo.src = data.url;
+                if (videoPlayerContainer) videoPlayerContainer.style.display = "block";
+                myVideo.style.display = "block";
+
+                if (videoInfoDetails) {
+                    videoInfoDetails.innerHTML = `
+                        <h2 class="animated-text">Video Details:</h2>
+                        <p><strong>Title:</strong> ${data.title || 'N/A'}</p>
+                        <p><strong>Username:</strong> ${data.username || 'N/A'}</p>
+                        <p><strong>Nickname:</strong> ${data.nickname || 'N/A'}</p>
+                        <p><strong>Total Videos:</strong> ${data.totalVideos || data.totalvids || 'N/A'}</p>
+                        ${data.sourceApiUser ? `<p><strong>Requested by:</strong> ${data.sourceApiUser}</p>` : ''}
+                    `;
+                }
+                if (videoInfoContainer) videoInfoContainer.style.display = "block";
+
+                if (mainHeader) mainHeader.style.display = "none";
+                staticContentSections.forEach(section => {
+                    section.classList.add('hidden-after-generate');
+                });
+
+                loadButton.disabled = false;
+                loadButton.textContent = "Generate Another Video";
+
+            } catch (error) {
+                console.error('Error in loadVideo:', error);
+                const displayErrorMessage = error.message ||
+                                          (error.toString && error.toString()) ||
+                                          'Could not load video. Check browser console for more details (e.g., Mixed Content, CORS, or network issues).';
+
+                if (videoInfoDetails) videoInfoDetails.innerHTML = `<h2 class="animated-text">Error</h2><p>${displayErrorMessage}</p>`;
+                if (videoInfoContainer) videoInfoContainer.style.display = "block";
+
+                loadButton.disabled = false;
+                loadButton.textContent = "Error. Try Again";
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="header" id="mainHeader">
+        <h1 class="animated-text">Random Shoti Video Generator</h1>
+        <h2 class="animated-text">Enjoy Ka Na Jan Tigang</h2>
+    </div>
+
+    <div class="rotating-border-container">
+        <button id="loadButton" onclick="loadVideo()">Generate Some Shoti Videos</button>
+    </div>
+
+    <div class="rotating-border-container video-outer-container" style="display: none;">
+        <video id="myVideo" controls autoplay muted loop></video>
+    </div>
+
+    <div class="rotating-border-container info-outer-container" style="display: none;">
+        <div class="video-info" id="videoInfoDetails">
+        </div>
+    </div>
+
+    <div class="rotating-border-container content-section static-content" id="aboutSection">
+        <div class="inner-content">
+            <h2 class="animated-text">About This Generator</h2>
+            <p>Welcome to the Random Shoti Video Generator! This tool allows you to fetch "Shoti" or "chix" videos.</p>
+        </div>
+    </div>
+
+    <div class="rotating-border-container content-section static-content" id="howToUseSection">
+        <div class="inner-content">
+            <h2 class="animated-text">How to Use</h2>
+            <ol>
+                <li>Simply click the "<strong>Generate Some Shoti Videos</strong>" button.</li>
+                <li>Wait for the video to load.</li>
+                <li>Once loaded, the video will appear and start playing.</li>
+                <li>Video details (if available) will be displayed below the player.</li>
+                <li>To get another video, click "<strong>Generate Another Video</strong>".</li>
+            </ol>
+        </div>
+    </div>
+
+</body>
+
+</html>
